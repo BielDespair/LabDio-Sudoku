@@ -11,11 +11,13 @@ import java.util.stream.IntStream;
 
 public class Board {
     private final int size;
+    private final int subBoardSize;
     private final Space[][] board;
 
     public Board(int size) {
         if (!isValidSize(size)) {throw new InvalidBoardSizeException();}
         this.size = size;
+        this.subBoardSize = (int) Math.sqrt(size);
         this.board = new Space[size][size];
 
         fillBoard();
@@ -85,5 +87,51 @@ public class Board {
 
     public Space[][] getBoard() {
         return board;
+    }
+
+    public Space[][] getSubBoards() {
+        Space[][] subBoards = new Space[size][size]; // n subBoards with n spaces e.g. 9x9 -> 9 subBoards with 9 spaces
+        int subBoardIndex = 0;
+        for (int subBoardRow = 0; subBoardRow < size; subBoardRow+=subBoardSize) {
+            for (int subBoardCol = 0; subBoardCol < size; subBoardCol+= subBoardSize) {
+
+                Space[] subBoardSpaces = new Space[subBoardSize*subBoardSize];
+                int subBoardSpacesIndex = 0;
+                for (int row = subBoardRow; row < subBoardRow+subBoardSize; row++) {
+                    for (int col = subBoardCol; col < subBoardCol+subBoardSize; col++) {
+                        subBoardSpaces[subBoardSpacesIndex++] = board[row][col];
+                    }
+                }
+                subBoards[subBoardIndex++] = subBoardSpaces;
+            }
+        }
+        return subBoards;
+    }
+
+    public Space[] getSpaceSubBoard(Space space) {
+        return new Space[0];
+    }
+
+    public void printBoard() {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                Space s = board[row][col];
+                System.out.print((s != null ? s.getValue() : ".") + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void printSubBoards() {
+        Space[][] subBoards = getSubBoards();
+
+        for (int i = 0; i < subBoards.length; i++) {
+            System.out.print("SubBoard " + i + ": ");
+            for (int j = 0; j < subBoards[i].length; j++) {
+                Space s = subBoards[i][j];
+                System.out.print((s != null ? s.getValue() : ".") + " ");
+            }
+            System.out.println();
+        }
     }
 }
