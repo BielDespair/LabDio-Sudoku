@@ -18,7 +18,7 @@ MEDIUM: Remove 50% das células.
 
 HARD: Remove 70% das células.
 
-## Diagrama das Classes
+## Diagrama de Classes
 
 ```mermaid
 classDiagram
