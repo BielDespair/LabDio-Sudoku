@@ -11,7 +11,7 @@ public class NumberTextLimit extends PlainDocument {
     private final List<String> NUMBERS;
 
     public NumberTextLimit(int boardSize) {
-        this.NUMBERS = IntStream.rangeClosed(1, boardSize)
+        this.NUMBERS = IntStream.rangeClosed(0, boardSize)
                 .mapToObj(String::valueOf)
                 .collect(Collectors.toList());
     }
@@ -19,9 +19,6 @@ public class NumberTextLimit extends PlainDocument {
     @Override
     public void insertString(final int offs, final String str, final AttributeSet a) throws BadLocationException {
         if (!NUMBERS.contains(str)) return;
-
-        if (getLength() + str.length() <= 1) {
-            super.insertString(offs, str, a);
-        }
+        super.insertString(offs, str, a);
     }
 }

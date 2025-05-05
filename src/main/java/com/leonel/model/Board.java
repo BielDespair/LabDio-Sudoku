@@ -2,10 +2,13 @@ package com.leonel.model;
 
 
 
+import com.leonel.config.GameConfig;
 import com.leonel.exceptions.InvalidBoardSizeException;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,10 +23,24 @@ public class Board {
         this.subBoardSize = (int) Math.sqrt(size);
         this.board = new Space[size][size];
 
+
         fillBoard();
+        removeRandomSpaces();
+
     }
 
-    public boolean fillBoard() {
+    public boolean isComplete() {
+        return Arrays.stream(board)
+                .flatMap(Arrays::stream) // Lineariza a matriz. Pega cada array dentro dos arrays e aplica stream, juntando em um unico array.
+                .allMatch(Space::isCorrect); // Aplica um predicate booleano (Space.isCorrect())  em cada elemento.
+    }
+
+    public void newGame() {
+        clearBoard();
+        fillBoard();
+        removeRandomSpaces();
+    }
+    private boolean fillBoard() {
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
                 if (board[r][c] == null) {
@@ -48,13 +65,25 @@ public class Board {
     }
 
     private void clearBoard() {
-        for (int r = 0; r < size; r++) {
-            for (int c = 0; c < size; c++) {
-                board[r][c] = null;
-            }
-        }
+        Arrays.stream(board).forEach(col -> Arrays.fill(col, null));
     }
 
+
+    private void removeRandomSpaces() {
+        List<Space> candidates = Arrays.stream(board)
+                .flatMap(Arrays::stream)
+                .collect(Collectors.toList());
+        Collections.shuffle(candidates);
+
+        int toRemove = (int) (size*size * GameConfig.difficulty.getRemoveRatio());
+        toRemove = Math.max(1, Math.min(toRemove, candidates.size()));
+
+        for (int i = 0; i < toRemove; i++) {
+            Space space = candidates.get(i);
+            space.setFixed(false);
+            space.clear();
+        }
+    }
 
     private boolean isValid(int row, int col, int num) {
         // Vertical check
@@ -68,7 +97,12 @@ public class Board {
             if (board[row][c] == null) {continue;}
             if (board[row][c].getValue() == num) { return false;}
         }
-        // sqrt(size) check
+
+        // Verificação no subBoard
+        Space[] subBoard = getSpaceSubBoard(row, col);
+        for (Space space : subBoard) {
+            if (space != null && Objects.equals(space.getValue(), num)) {return false;}
+        }
 
         return true;
     }
@@ -78,15 +112,6 @@ public class Board {
         if (size < 1) {return false;}
         int sqrt = (int) Math.sqrt(size);
         return sqrt * sqrt == size;
-    }
-
-    public void setValue(int row, int col, int value) {
-        Space space = this.board[row][col];
-        space.setValue(value);
-    }
-
-    public Space[][] getBoard() {
-        return board;
     }
 
     public Space[][] getSubBoards() {
@@ -108,30 +133,24 @@ public class Board {
         return subBoards;
     }
 
-    public Space[] getSpaceSubBoard(Space space) {
-        return new Space[0];
+    public Space[] getSpaceSubBoard(int row, int col) {
+        int subSize = (int) Math.sqrt(size); // Ex: 9 → 3
+        int startRow = (row / subSize) * subSize;
+        int startCol = (col / subSize) * subSize;
+
+        Space[] subBoardSpaces = new Space[size];
+
+        int index = 0;
+        for (int r = startRow; r < startRow + subSize; r++) {
+            for (int c = startCol; c < startCol + subSize; c++) {
+                subBoardSpaces[index++] = board[r][c];
+            }
+        }
+
+        return subBoardSpaces;
     }
 
-    public void printBoard() {
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
-                Space s = board[row][col];
-                System.out.print((s != null ? s.getValue() : ".") + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    public void printSubBoards() {
-        Space[][] subBoards = getSubBoards();
-
-        for (int i = 0; i < subBoards.length; i++) {
-            System.out.print("SubBoard " + i + ": ");
-            for (int j = 0; j < subBoards[i].length; j++) {
-                Space s = subBoards[i][j];
-                System.out.print((s != null ? s.getValue() : ".") + " ");
-            }
-            System.out.println();
-        }
+    public int getSubBoardSize() {
+        return subBoardSize;
     }
 }
