@@ -7,7 +7,7 @@ Jogo Sudoku com Java Swing. Projeto feito para o Bootcamp Bradesco - Java Cloud 
 O tamanho do tabuleiro e a dificuldade do jogo podem ser ajustados no arquivo de configuração **`GameConfig`**.
 
 ### Tamanho do Tabuleiro
-O tamanho do tabuleiro é configurado pela variável `BOARD_SIZE` em **`GameConfig`**. Essa variável define o tamanho da grade do tabuleiro de Sudoku, que deve ser um número perfeito (exemplo: 9 para um tabuleiro 9x9 ou 16 para um tabuleiro 16x16).
+O tamanho do tabuleiro é configurado pela variável `BOARD_SIZE` em **`GameConfig`**. Essa variável define o tamanho da grade do tabuleiro de Sudoku, que deve ser um quadrado perfeito (exemplo: 9 para um tabuleiro 9x9 ou 16 para um tabuleiro 16x16).
 
 ### Dificuldade
 A dificuldade do jogo pode ser configurada pela variável `difficulty`, também em **`GameConfig`**. A dificuldade controla a porcentagem de espaços que serão removidos do tabuleiro para criar um desafio. As opções de dificuldade disponíveis são:
